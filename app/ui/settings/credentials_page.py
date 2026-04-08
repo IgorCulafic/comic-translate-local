@@ -84,6 +84,47 @@ class CredentialsPage(QtWidgets.QWidget):
                 # service_layout.addWidget(region_input)
                 # self.credential_widgets["Microsoft Azure_region"] = region_input
 
+            elif normalized == "Local LLM":
+                # Optional API key (most local servers accept anything or nothing)
+                api_key_input = MLineEdit()
+                api_key_input.setEchoMode(QtWidgets.QLineEdit.Password)
+                api_key_input.setFixedWidth(400)
+                api_key_input.setPlaceholderText(self.tr("Optional (leave blank for most local servers)"))
+                api_key_prefix = MLabel(self.tr("API Key")).border()
+                set_label_width(api_key_prefix)
+                api_key_prefix.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+                api_key_input.set_prefix_widget(api_key_prefix)
+                service_layout.addWidget(api_key_input)
+                self.credential_widgets["Local LLM_api_key"] = api_key_input
+
+                # Base URL of the local server
+                endpoint_input = MLineEdit()
+                endpoint_input.setFixedWidth(400)
+                endpoint_input.setPlaceholderText("http://localhost:11434  (Ollama default)")
+                endpoint_prefix = MLabel(self.tr("Server URL")).border()
+                set_label_width(endpoint_prefix)
+                endpoint_prefix.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+                endpoint_input.set_prefix_widget(endpoint_prefix)
+                service_layout.addWidget(endpoint_input)
+                self.credential_widgets["Local LLM_api_url"] = endpoint_input
+
+                # Model name/tag
+                model_input = MLineEdit()
+                model_input.setFixedWidth(400)
+                model_input.setPlaceholderText(self.tr("e.g. llama3, mistral, gemma2, phi3"))
+                model_prefix = MLabel(self.tr("Model")).border()
+                set_label_width(model_prefix)
+                model_prefix.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+                model_input.set_prefix_widget(model_prefix)
+                service_layout.addWidget(model_input)
+                self.credential_widgets["Local LLM_model"] = model_input
+
+                # Vision/multimodal toggle
+                supports_images_checkbox = MCheckBox(self.tr("Model supports vision/image input"))
+                supports_images_checkbox.setChecked(False)
+                service_layout.addWidget(supports_images_checkbox)
+                self.credential_widgets["Local LLM_supports_images"] = supports_images_checkbox
+
             elif normalized == "Custom":
                 api_key_input = MLineEdit()
                 api_key_input.setEchoMode(QtWidgets.QLineEdit.Password)
