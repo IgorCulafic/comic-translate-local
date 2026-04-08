@@ -56,6 +56,7 @@ class Translator:
         """
         translator_map = {
             self.settings.ui.tr("Custom"): "Custom",
+            self.settings.ui.tr("Local LLM"): "Local LLM",
             self.settings.ui.tr("Deepseek-v3"): "Deepseek-v3",
             self.settings.ui.tr("GPT-4.1"): "GPT-4.1",
             self.settings.ui.tr("GPT-4.1-mini"): "GPT-4.1-mini",

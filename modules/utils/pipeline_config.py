@@ -30,6 +30,9 @@ def get_config(settings_page: SettingsPage):
 
     return config
 
+# Translators that run fully locally and never need an account
+LOCAL_TRANSLATORS = {'Custom', 'Local LLM'}
+
 def validate_ocr(main: ComicTranslate):
     """Ensure either API credentials are set or the user is authenticated."""
     settings_page = main.settings_page
@@ -37,10 +40,16 @@ def validate_ocr(main: ComicTranslate):
     settings = settings_page.get_all_settings()
     credentials = settings.get('credentials', {})
     ocr_tool = settings['tools']['ocr']
+    translator_tool = settings['tools']['translator']
 
     if not ocr_tool:
         Messages.show_missing_tool_error(main, QCoreApplication.translate("Messages", "Text Recognition model"))
         return False
+
+    # Skip login check when using a fully local translator — OCR models
+    # run locally too, so no account is needed in this configuration.
+    if any(local in translator_tool for local in LOCAL_TRANSLATORS):
+        return True
     
     if not settings_page.is_logged_in():
         Messages.show_not_logged_in_error(main)
@@ -61,20 +70,27 @@ def validate_translator(main: ComicTranslate, target_lang: str):
         Messages.show_missing_tool_error(main, QCoreApplication.translate("Messages", "Translator"))
         return False
 
-    if not settings_page.is_logged_in():
-        Messages.show_not_logged_in_error(main)
-        return False
-
-    # Credential checks
+    # Credential checks for local translators — these never need an account.
     if "Custom" in translator_tool:
-        # Custom requires api_key, api_url, and model to be configured LOCALLY
         service = tr('Custom')
         creds = credentials.get(service, {})
-        # Check if all required fields are present and non-empty
         if not all([creds.get('api_key'), creds.get('api_url'), creds.get('model')]):
             Messages.show_custom_not_configured_error(main)
             return False
         return True
+
+    if "Local LLM" in translator_tool:
+        service = tr('Local LLM')
+        creds = credentials.get(service, {})
+        # api_url and model are required; api_key is optional
+        if not all([creds.get('api_url'), creds.get('model')]):
+            Messages.show_custom_not_configured_error(main)
+            return False
+        return True
+
+    if not settings_page.is_logged_in():
+        Messages.show_not_logged_in_error(main)
+        return False
         
     return True
 

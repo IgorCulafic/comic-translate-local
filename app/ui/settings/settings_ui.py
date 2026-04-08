@@ -63,7 +63,8 @@ class SettingsPageUI(QtWidgets.QWidget):
         self.alignment = [self.tr("Left"), self.tr("Center"), self.tr("Right")]
 
         self.credential_services = [
-            self.tr("Custom"), 
+            self.tr("Custom"),
+            self.tr("Local LLM"),
         ]
         
         self.supported_translators = [
@@ -74,6 +75,7 @@ class SettingsPageUI(QtWidgets.QWidget):
             self.tr("Claude-4.5-Haiku"),
             self.tr("Deepseek-v3"),
             self.tr("Custom"),
+            self.tr("Local LLM"),
         ]
         
         self.languages = [
@@ -142,6 +144,7 @@ class SettingsPageUI(QtWidgets.QWidget):
 
             # Credential services mappings
             self.tr("Custom"): "Custom",
+            self.tr("Local LLM"): "Local LLM",
             self.tr("Deepseek"): "Deepseek",
             self.tr("Open AI GPT"): "Open AI GPT",
             self.tr("Microsoft Azure"): "Microsoft Azure",

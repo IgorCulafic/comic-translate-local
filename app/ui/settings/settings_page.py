@@ -140,12 +140,18 @@ class SettingsPage(QtWidgets.QWidget):
             w = self.ui.credential_widgets.get(widget_key)
             return w.text() if w is not None else None
 
+        def _checked_or_false(widget_key):
+            w = self.ui.credential_widgets.get(widget_key)
+            return w.isChecked() if w is not None else False
+
         if service:
             normalized = self.ui.value_mappings.get(service, service)
             creds = {'save_key': save_keys}
-            if normalized == "Custom":
+            if normalized in ("Custom", "Local LLM"):
                 for field in ("api_key", "api_url", "model"):
-                    creds[field] = _text_or_none(f"Custom_{field}")
+                    creds[field] = _text_or_none(f"{normalized}_{field}")
+            if normalized == "Local LLM":
+                creds['supports_images'] = _checked_or_false("Local LLM_supports_images")
 
             return creds
 
@@ -266,10 +272,12 @@ class SettingsPage(QtWidgets.QWidget):
             for service, cred in credentials.items():
                 translated_service = self.ui.value_mappings.get(service, service)
                 
-                if translated_service == "Custom":
+                if translated_service in ("Custom", "Local LLM"):
                     settings.setValue(f"{translated_service}_api_key", cred['api_key'])
                     settings.setValue(f"{translated_service}_api_url", cred['api_url'])
                     settings.setValue(f"{translated_service}_model", cred['model'])
+                if translated_service == "Local LLM":
+                    settings.setValue("Local LLM_supports_images", cred.get('supports_images', False))
         else:
             settings.remove('credentials')  # Clear all credentials if save_keys is unchecked
         settings.endGroup()
@@ -368,10 +376,14 @@ class SettingsPage(QtWidgets.QWidget):
             for service in self.ui.credential_services:
                 translated_service = self.ui.value_mappings.get(service, service)
                 
-                if translated_service == "Custom":
+                if translated_service in ("Custom", "Local LLM"):
                     self.ui.credential_widgets[f"{translated_service}_api_key"].setText(settings.value(f"{translated_service}_api_key", ''))
                     self.ui.credential_widgets[f"{translated_service}_api_url"].setText(settings.value(f"{translated_service}_api_url", ''))
                     self.ui.credential_widgets[f"{translated_service}_model"].setText(settings.value(f"{translated_service}_model", ''))
+                if translated_service == "Local LLM":
+                    self.ui.credential_widgets["Local LLM_supports_images"].setChecked(
+                        settings.value("Local LLM_supports_images", False, type=bool)
+                    )
         settings.endGroup()
 
         # ADDED: Load user info and update account view 
